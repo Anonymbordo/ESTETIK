@@ -165,6 +165,38 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
     </svg>
   );
 
+  // Mask Overlay to isolate the effect
+  const NoseMask = () => {
+      // Calculate mask position based on points
+      const minX = Math.min(points.leftAla.x, points.bridgeTop.x) - 20;
+      const maxX = Math.max(points.rightAla.x, points.bridgeTop.x) + 20;
+      const minY = points.bridgeTop.y - 20;
+      const maxY = points.tip.y + 20;
+
+      // Convert SVG coordinates (0-200) to percentage (0-100%)
+      const left = (minX / 200) * 100;
+      const top = (minY / 200) * 100;
+      const w = ((maxX - minX) / 200) * 100;
+      const h = ((maxY - minY) / 200) * 100;
+
+      return (
+          <div 
+            className="absolute pointer-events-none rounded-[50%]"
+            style={{
+                top: `${top}%`,
+                left: `${left}%`,
+                width: `${w}%`,
+                height: `${h}%`,
+                backdropFilter: `url(#${filterId})`,
+                WebkitBackdropFilter: `url(#${filterId})`,
+                maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)',
+                WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)',
+                zIndex: 10
+            }}
+          />
+      )
+  }
+
   const Controls = () => (
     <div className="space-y-6">
        {[
@@ -222,11 +254,13 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             src={capturedImage!} 
             alt="Result" 
             className="w-full h-full object-cover"
-            style={{ filter: `url(#${filterId})` }} 
           />
-          <WarpFilter />
           
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+          {/* Apply mask on result too */}
+          <WarpFilter />
+          <NoseMask />
+          
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent z-20">
             <div className="flex gap-3">
               <Button onClick={resetAll} variant="outline" className="flex-1 border-white/20 text-white hover:bg-white/10 bg-white/5 backdrop-blur-sm">
                 <RefreshCw className="w-4 h-4 mr-2" /> Yeni
@@ -237,7 +271,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             </div>
           </div>
 
-          <div className="absolute top-4 right-4 bg-green-500/20 backdrop-blur-md text-green-400 px-3 py-1 rounded-full text-xs font-bold border border-green-500/30 flex items-center gap-1">
+          <div className="absolute top-4 right-4 bg-green-500/20 backdrop-blur-md text-green-400 px-3 py-1 rounded-full text-xs font-bold border border-green-500/30 flex items-center gap-1 z-20">
             <Check className="w-3 h-3" /> AI ANALİZİ TAMAMLANDI
           </div>
         </motion.div>
@@ -299,7 +333,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
               src={capturedImage} 
               alt="Captured" 
               className="w-full h-full object-cover scale-x-[-1]"
-              style={{ filter: `url(#${filterId})` }}
+              // style={{ filter: `url(#${filterId})` }} // REMOVED GLOBAL FILTER
             />
           ) : (
             <Webcam
@@ -308,9 +342,15 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
               screenshotFormat="image/jpeg"
               videoConstraints={{ facingMode: "user", aspectRatio: 0.75 }}
               className="w-full h-full object-cover scale-x-[-1]"
-              style={{ filter: mode === 'live' ? `url(#${filterId})` : 'none' }}
+              // style={{ filter: mode === 'live' ? `url(#${filterId})` : 'none' }} // REMOVED GLOBAL FILTER
             />
           )}
+
+          {/* 
+            ISOLATED NOSE EFFECT
+            This overlays the warping filter ONLY on the nose area defined by the points.
+          */}
+          <NoseMask />
           
           {/* Interactive Mesh Overlay */}
           <AnimatePresence>
