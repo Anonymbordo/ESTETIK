@@ -1,15 +1,24 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Webcam from "react-webcam";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, RefreshCw, ChevronUp, Maximize2, ScanFace, Wand2, Info, Sliders, Image as ImageIcon, Loader2, Download, Share2, Check } from "lucide-react";
+import { Camera, RefreshCw, ChevronUp, Maximize2, ScanFace, Wand2, Info, Sliders, Image as ImageIcon, Loader2, Download, Share2, Check, Move } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SimulatorProps {
   onSnapshot: (image: string) => void;
 }
+
+// Initial positions for the mesh points (relative to 200x200 viewBox)
+const INITIAL_POINTS = {
+  bridgeTop: { x: 100, y: 40 },
+  bridgeMid: { x: 100, y: 70 },
+  tip: { x: 100, y: 105 },
+  leftAla: { x: 85, y: 85 },
+  rightAla: { x: 115, y: 85 },
+};
 
 export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
   const webcamRef = useRef<Webcam>(null);
@@ -21,6 +30,11 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
   const [bridge, setBridge] = useState(0); 
   const [showMesh, setShowMesh] = useState(true);
   
+  // Interactive Points State
+  const [points, setPoints] = useState(INITIAL_POINTS);
+  const [draggedPoint, setDraggedPoint] = useState<string | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  
   // Process State
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -31,24 +45,35 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
   // Filter Setup
   const filterId = "nose-warp";
 
+  // Update points when sliders change (bi-directional binding)
+  useEffect(() => {
+    if (draggedPoint) return; // Don't update from sliders while dragging
+
+    setPoints(prev => ({
+      ...prev,
+      // Width affects side points
+      leftAla: { x: INITIAL_POINTS.leftAla.x - (width * 0.2), y: INITIAL_POINTS.leftAla.y },
+      rightAla: { x: INITIAL_POINTS.rightAla.x + (width * 0.2), y: INITIAL_POINTS.rightAla.y },
+      // Lift affects tip y
+      tip: { x: INITIAL_POINTS.tip.x, y: INITIAL_POINTS.tip.y - (lift * 0.3) },
+      // Bridge affects bridge mid point (simulating bump reduction/increase)
+      bridgeMid: { x: INITIAL_POINTS.bridgeMid.x, y: INITIAL_POINTS.bridgeMid.y - (bridge * 0.1) } // Simplified visual
+    }));
+  }, [width, lift, bridge, draggedPoint]);
+
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
-      // Flash effect
       const shutter = document.createElement('div');
       shutter.className = "fixed inset-0 bg-white z-[60] pointer-events-none animate-out fade-out duration-500";
       document.body.appendChild(shutter);
       setTimeout(() => shutter.remove(), 500);
 
       if (mode === 'photo') {
-        // Photo Mode: Capture raw, then edit
         setCapturedImage(imageSrc);
         resetSliders();
       } else {
-        // Live Mode: Capture warped, then generate
-        setCapturedImage(imageSrc); // This is already warped visually if we capture the canvas with filter, but react-webcam captures raw feed usually. 
-        // Note: react-webcam captures raw video feed. To capture CSS filters, we'd need canvas manipulation.
-        // For this prototype, we'll simulate the "Generation" phase using the raw capture + current slider values.
+        setCapturedImage(imageSrc);
         startGeneration();
       }
     }
@@ -58,8 +83,6 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);
-      // In a real app, this would be the result from the backend
-      // For now, we just show the captured image as the "result" (simulating the process)
       setGeneratedResult(capturedImage || "result"); 
       onSnapshot(capturedImage || "");
     }, 3000);
@@ -69,6 +92,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
     setWidth(0);
     setLift(0);
     setBridge(0);
+    setPoints(INITIAL_POINTS);
   };
 
   const resetAll = () => {
@@ -78,7 +102,58 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
     resetSliders();
   };
 
-  // Visual Warp Component (Reused for both Webcam and Image)
+  // --- Drag Logic ---
+  const handlePointerDown = (pointId: string, e: React.PointerEvent) => {
+    e.stopPropagation();
+    // @ts-ignore
+    e.target.setPointerCapture(e.pointerId);
+    setDraggedPoint(pointId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!draggedPoint || !svgRef.current) return;
+
+    const svgRect = svgRef.current.getBoundingClientRect();
+    // Convert client coordinates to SVG coordinates (viewBox 0 0 200 200)
+    const scaleX = 200 / svgRect.width;
+    const scaleY = 200 / svgRect.height;
+    
+    const x = (e.clientX - svgRect.left) * scaleX;
+    const y = (e.clientY - svgRect.top) * scaleY;
+
+    // Update point position locally
+    setPoints(prev => ({
+      ...prev,
+      [draggedPoint]: { x, y }
+    }));
+
+    // Update sliders based on point movement (Inverse kinematics-ish)
+    if (draggedPoint === 'tip') {
+      // Calculate lift based on Y difference
+      const diffY = INITIAL_POINTS.tip.y - y;
+      setLift(Math.max(-50, Math.min(50, diffY / 0.3)));
+    } else if (draggedPoint === 'rightAla') {
+      // Calculate width based on X difference
+      const diffX = x - INITIAL_POINTS.rightAla.x;
+      setWidth(Math.max(-50, Math.min(50, diffX / 0.2)));
+    } else if (draggedPoint === 'leftAla') {
+       // Calculate width based on X difference (mirrored)
+      const diffX = INITIAL_POINTS.leftAla.x - x;
+      setWidth(Math.max(-50, Math.min(50, diffX / 0.2)));
+    } else if (draggedPoint === 'bridgeTop' || draggedPoint === 'bridgeMid') {
+       // Simple bridge adjustment
+       const diffY = INITIAL_POINTS.bridgeMid.y - y;
+       setBridge(Math.max(-50, Math.min(50, diffY / 0.1)));
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    setDraggedPoint(null);
+    // @ts-ignore
+    e.target.releasePointerCapture(e.pointerId);
+  };
+
+
   const WarpFilter = () => (
     <svg className="absolute w-0 h-0">
       <defs>
@@ -106,7 +181,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
                 {control.label}
               </label>
               <span className="text-xs font-mono font-medium text-slate-400 w-8 text-right">
-                {control.val > 0 ? '+' : ''}{control.val}
+                {control.val > 0 ? '+' : ''}{Math.round(control.val)}
               </span>
             </div>
             
@@ -147,7 +222,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             src={capturedImage!} 
             alt="Result" 
             className="w-full h-full object-cover"
-            style={{ filter: `url(#${filterId})` }} // Apply the warp to the result image
+            style={{ filter: `url(#${filterId})` }} 
           />
           <WarpFilter />
           
@@ -190,7 +265,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
     <div className="relative w-full h-[calc(100vh-4rem)] md:h-screen flex flex-col lg:flex-row bg-slate-50 overflow-hidden pt-16 md:pt-20 pb-0">
       <WarpFilter />
       
-      {/* Mode Switcher (Desktop: Top Left, Mobile: Top Center below header) */}
+      {/* Mode Switcher */}
       <div className="absolute top-20 md:top-24 left-0 right-0 z-30 flex justify-center px-4 pointer-events-none">
         <div className="bg-white/90 backdrop-blur-md p-1.5 rounded-2xl shadow-lg border border-white/20 pointer-events-auto inline-flex">
           <button
@@ -237,23 +312,63 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             />
           )}
           
-          {/* Mesh Overlay (Only in Live Mode or when Photo is active) */}
+          {/* Interactive Mesh Overlay */}
           <AnimatePresence>
             {showMesh && !generatedResult && (
               <motion.div 
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.4 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 pointer-events-none flex items-center justify-center"
+                className="absolute inset-0 flex items-center justify-center z-20"
               >
-                 <svg viewBox="0 0 200 200" className="w-64 h-64 text-primary animate-pulse drop-shadow-[0_0_8px_rgba(14,165,233,0.5)]">
-                  <path d="M100,40 C110,40 115,50 115,70 C115,90 110,100 100,105 C90,100 85,90 85,70 C85,50 90,40 100,40" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                  <path d="M100,40 L100,105" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
-                  <circle cx="100" cy="40" r="1.5" className="fill-white" />
-                  <circle cx="100" cy="105" r="1.5" className="fill-white" />
-                  <circle cx="115" cy="70" r="1.5" className="fill-white" />
-                  <circle cx="85" cy="70" r="1.5" className="fill-white" />
+                 <svg 
+                    ref={svgRef}
+                    viewBox="0 0 200 200" 
+                    className="w-64 h-64 drop-shadow-[0_0_8px_rgba(14,165,233,0.5)] touch-none"
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                 >
+                  {/* Connecting Lines */}
+                  <path 
+                    d={`M${points.bridgeTop.x},${points.bridgeTop.y} L${points.bridgeMid.x},${points.bridgeMid.y} L${points.tip.x},${points.tip.y}`} 
+                    fill="none" stroke="rgba(14,165,233,0.5)" strokeWidth="1" 
+                  />
+                  <path 
+                    d={`M${points.leftAla.x},${points.leftAla.y} Q${points.tip.x},${points.tip.y+10} ${points.rightAla.x},${points.rightAla.y}`} 
+                    fill="none" stroke="rgba(14,165,233,0.5)" strokeWidth="1" 
+                  />
+                  <path 
+                    d={`M${points.bridgeTop.x},${points.bridgeTop.y} L${points.leftAla.x},${points.leftAla.y}`} 
+                    fill="none" stroke="rgba(14,165,233,0.3)" strokeWidth="0.5" strokeDasharray="2 2"
+                  />
+                   <path 
+                    d={`M${points.bridgeTop.x},${points.bridgeTop.y} L${points.rightAla.x},${points.rightAla.y}`} 
+                    fill="none" stroke="rgba(14,165,233,0.3)" strokeWidth="0.5" strokeDasharray="2 2"
+                  />
+
+                  {/* Interactive Points */}
+                  {Object.entries(points).map(([key, p]) => (
+                    <circle 
+                      key={key}
+                      cx={p.x} 
+                      cy={p.y} 
+                      r={draggedPoint === key ? 6 : 4} 
+                      className={`
+                        cursor-grab active:cursor-grabbing transition-all duration-200
+                        ${draggedPoint === key ? 'fill-white stroke-primary stroke-[3px]' : 'fill-white/80 stroke-transparent hover:fill-white hover:stroke-primary/50 hover:stroke-2'}
+                      `}
+                      onPointerDown={(e) => handlePointerDown(key, e)}
+                    />
+                  ))}
                 </svg>
+                
+                {/* Helper Text (only shows initially) */}
+                 <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none opacity-0 animate-[fadeIn_1s_ease-in_2s_forwards]">
+                   <span className="bg-black/50 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-md">
+                     Noktaları sürükleyerek düzenleyin
+                   </span>
+                 </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -332,7 +447,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
                   <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                   <p className="text-xs text-slate-600 leading-relaxed">
                     {mode === 'live' 
-                      ? "Değişiklikler canlı yayında uygulanır. Fotoğraf çekerek sonucu sabitleyebilirsiniz." 
+                      ? "Değişiklikler canlı yayında uygulanır. Noktaları sürükleyerek veya slider ile düzenleyin." 
                       : "Fotoğraf üzerindeki noktaları düzenleyin ve 'AI Oluştur' ile sonucu alın."}
                   </p>
                </div>
