@@ -11,20 +11,20 @@ import after1 from "@assets/stock_images/woman_face_profile_v_97744a8b.jpg";
 const cases = [
   {
     id: 1,
-    title: "Rhinoplasty & Chin Augmentation",
+    title: "Burun Estetiği & Çene Dolgusu",
     doctor: "Dr. Sarah Chen",
-    tags: ["Rhinoplasty", "Chin Implant", "Profile Balancing"],
-    description: "Complete profile harmonization achieving a natural, lifted tip and refined bridge.",
+    tags: ["Rinoplasti", "Çene İmplantı", "Profil Dengeleme"],
+    description: "Doğal, kalkık bir burun ucu ve inceltilmiş kemer ile tam profil uyumu sağlandı.",
     before: before1,
     after: after1
   },
   {
     id: 2,
-    title: "Revision Rhinoplasty",
+    title: "Revizyon Rinoplasti",
     doctor: "Dr. Michael Ross",
-    tags: ["Revision", "Structural Grafting"],
-    description: "Correction of previous surgical asymmetry and breathing improvement.",
-    before: after1, // Using reverse for variety in demo
+    tags: ["Revizyon", "Yapısal Greftleme"],
+    description: "Önceki cerrahi asimetrisinin düzeltilmesi ve solunumun iyileştirilmesi.",
+    before: after1, // Demo çeşitliliği için ters kullanılıyor
     after: before1
   }
 ];
@@ -42,7 +42,7 @@ export default function Gallery() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900"
           >
-            Real Results, <span className="text-gradient-primary">Natural Beauty</span>
+            Gerçek Sonuçlar, <span className="text-gradient-primary">Doğal Güzellik</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -50,13 +50,13 @@ export default function Gallery() {
             transition={{ delay: 0.1 }}
             className="text-lg text-slate-600 max-w-2xl mx-auto"
           >
-            Explore our curated gallery of patient transformations. Every procedure is tailored to the individual's unique anatomy and aesthetic goals.
+            Özenle seçilmiş hasta dönüşüm galerimizi keşfedin. Her prosedür, kişinin benzersiz anatomisine ve estetik hedeflerine göre uyarlanmıştır.
           </motion.p>
         </div>
 
         {/* Filter Bar */}
         <div className="flex flex-wrap gap-2 justify-center mb-12">
-          {["All Cases", "Rhinoplasty", "Revision", "Septoplasty", "Non-Surgical"].map((filter, i) => (
+          {["Tüm Vakalar", "Rinoplasti", "Revizyon", "Septoplasti", "Ameliyatsız"].map((filter, i) => (
             <Button 
               key={filter} 
               variant={i === 0 ? "default" : "outline"}
@@ -97,7 +97,7 @@ export default function Gallery() {
                       </p>
                     </div>
                     <Button variant="outline" size="sm" className="rounded-full text-xs">
-                      View Details
+                      Detayları Gör
                     </Button>
                   </div>
                   

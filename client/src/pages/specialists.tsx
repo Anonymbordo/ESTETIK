@@ -11,24 +11,24 @@ const specialists = [
   {
     id: 1,
     name: "Dr. Sarah Chen",
-    title: "Double Board Certified Facial Plastic Surgeon",
-    specialties: ["Rhinoplasty", "Revision Rhinoplasty", "Ethnic Rhinoplasty"],
+    title: "Çift Sertifikalı Yüz Plastik Cerrahı",
+    specialties: ["Rinoplasti", "Revizyon Rinoplasti", "Etnik Rinoplasti"],
     rating: 4.9,
     reviews: 128,
-    location: "Beverly Hills, CA",
+    location: "İstanbul, Nişantaşı",
     image: doctor2,
-    education: ["Harvard Medical School", "Johns Hopkins Residency"]
+    education: ["Harvard Tıp Fakültesi", "Johns Hopkins Asistanlık"]
   },
   {
     id: 2,
     name: "Dr. Michael Ross",
-    title: "Chief of Otolaryngology",
-    specialties: ["Functional Rhinoplasty", "Septoplasty", "Reconstructive Surgery"],
+    title: "KBB Anabilim Dalı Başkanı",
+    specialties: ["Fonksiyonel Rinoplasti", "Septoplasti", "Rekonstrüktif Cerrahi"],
     rating: 5.0,
     reviews: 94,
-    location: "New York, NY",
+    location: "İstanbul, Etiler",
     image: doctor1,
-    education: ["Yale School of Medicine", "Mayo Clinic Fellowship"]
+    education: ["Yale Tıp Fakültesi", "Mayo Clinic Uzmanlık"]
   }
 ];
 
@@ -45,10 +45,10 @@ export default function Specialists() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-4"
           >
-            World-Class <span className="text-gradient-primary">Surgeons</span>
+            Dünya Standartlarında <span className="text-gradient-primary">Cerrahlar</span>
           </motion.h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Choose from our network of elite, board-certified specialists who combine artistic vision with surgical precision.
+            Sanatsal vizyonu cerrahi hassasiyetle birleştiren seçkin, kurul onaylı uzman ağımızdan seçiminizi yapın.
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function Specialists() {
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Specialties</p>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Uzmanlık Alanları</p>
                     <div className="flex flex-wrap gap-2">
                       {doctor.specialties.map(spec => (
                         <span key={spec} className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md font-medium">
@@ -110,7 +110,7 @@ export default function Specialists() {
 
                   <div>
                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                      <Award className="w-3 h-3" /> Education
+                      <Award className="w-3 h-3" /> Eğitim
                      </p>
                      <ul className="text-sm text-slate-600 space-y-1">
                        {doctor.education.map(edu => (
@@ -125,11 +125,11 @@ export default function Specialists() {
 
                 <div className="mt-auto flex gap-3">
                   <Button className="flex-1 shadow-lg shadow-primary/20 group/btn">
-                    Book Consultation
+                    Randevu Al
                     <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" />
                   </Button>
                   <Button variant="outline" className="flex-1">
-                    View Profile
+                    Profili Gör
                   </Button>
                 </div>
               </div>

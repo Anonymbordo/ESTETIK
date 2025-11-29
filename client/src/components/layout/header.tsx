@@ -16,16 +16,16 @@ export function Header() {
               <Video className="w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight text-slate-900 group-hover:text-primary transition-colors">
-              Rhinoplasty<span className="text-primary">AI</span>
+              BurunEstetik<span className="text-primary">AI</span>
             </span>
           </div>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
           {[
-            { path: "/", label: "Simulation" },
-            { path: "/gallery", label: "Gallery" },
-            { path: "/specialists", label: "Specialists" }
+            { path: "/", label: "Simülasyon" },
+            { path: "/gallery", label: "Galeri" },
+            { path: "/specialists", label: "Uzmanlar" }
           ].map((link) => (
             <Link key={link.path} href={link.path}>
               <div 
@@ -45,10 +45,12 @@ export function Header() {
           <Button variant="ghost" size="icon" className="text-slate-600 hover:bg-slate-100 rounded-full">
             <MessageSquare className="w-5 h-5" />
           </Button>
-          <Button className="hidden sm:flex gap-2 shadow-lg shadow-primary/20 rounded-full px-6">
-            <Calendar className="w-4 h-4" />
-            <span>Book Consultation</span>
-          </Button>
+          <Link href="/booking">
+            <Button className="hidden sm:flex gap-2 shadow-lg shadow-primary/20 rounded-full px-6">
+              <Calendar className="w-4 h-4" />
+              <span>Randevu Al</span>
+            </Button>
+          </Link>
           <Button size="icon" variant="ghost" className="sm:hidden">
             <User className="w-5 h-5" />
           </Button>

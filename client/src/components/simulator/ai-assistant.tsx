@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: "Hello! I'm Dr. AI. I can help you schedule a consultation or answer questions about the procedure." }
+    { role: 'assistant', text: "Merhaba! Ben Dr. AI. Size randevu planlamasında veya prosedürle ilgili sorularınızda yardımcı olabilirim." }
   ]);
   const [isListening, setIsListening] = useState(false);
 
@@ -47,10 +47,10 @@ export function AIAssistant() {
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm">Aesthetic Assistant</h3>
+                    <h3 className="font-bold text-sm">Estetik Asistanı</h3>
                     <p className="text-xs text-white/80 flex items-center gap-1">
                       <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                      Online
+                      Çevrimiçi
                     </p>
                   </div>
                 </div>
@@ -97,7 +97,7 @@ export function AIAssistant() {
                 </Button>
                 <input 
                   type="text" 
-                  placeholder="Type a message..." 
+                  placeholder="Bir mesaj yazın..." 
                   className="flex-1 bg-slate-50 border-none rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none"
                 />
                 <Button size="icon" variant="ghost" className="text-primary">

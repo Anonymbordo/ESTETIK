@@ -45,7 +45,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col lg:flex-row gap-6 p-4 lg:p-8 pt-20 h-screen bg-slate-50 overflow-hidden">
+    <div className="relative w-full h-full flex flex-col lg:flex-row gap-6 p-4 lg:p-8 pt-20 h-screen overflow-hidden">
       
       {/* Main Viewport (Webcam) */}
       <div className="flex-1 relative bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-slate-200">
@@ -140,10 +140,10 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
       <Card className="w-full lg:w-96 shrink-0 flex flex-col bg-white/80 backdrop-blur-lg border-white/50 shadow-xl rounded-3xl overflow-hidden">
         <div className="p-6 border-b border-slate-100">
           <h2 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            Adjustments
+            Ayarlar
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            AI-powered geometric warping (Preview)
+            AI Destekli Geometrik Warping (Önizleme)
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                 <Maximize2 className="w-4 h-4 rotate-45" />
-                Nose Width
+                Burun Genişliği
               </label>
               <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">{width > 0 ? '+' : ''}{width}%</span>
             </div>
@@ -167,8 +167,8 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
               className="py-2"
             />
             <div className="flex justify-between text-[10px] text-slate-400 uppercase tracking-wider">
-              <span>Narrow</span>
-              <span>Widen</span>
+              <span>Daralt</span>
+              <span>Genişlet</span>
             </div>
           </div>
 
@@ -177,7 +177,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                 <ChevronUp className="w-4 h-4" />
-                Tip Rotation
+                Burun Ucu Kaldırma
               </label>
               <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">{lift > 0 ? '+' : ''}{lift}°</span>
             </div>
@@ -190,8 +190,8 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
               className="py-2"
             />
             <div className="flex justify-between text-[10px] text-slate-400 uppercase tracking-wider">
-              <span>Drop</span>
-              <span>Lift</span>
+              <span>Düşür</span>
+              <span>Kaldır</span>
             </div>
           </div>
 
@@ -200,7 +200,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                 <Wand2 className="w-4 h-4" />
-                Bridge Height
+                Kemer Yüksekliği
               </label>
               <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">{bridge > 0 ? '+' : ''}{bridge}%</span>
             </div>
@@ -213,8 +213,8 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
               className="py-2"
             />
             <div className="flex justify-between text-[10px] text-slate-400 uppercase tracking-wider">
-              <span>Reduce</span>
-              <span>Build</span>
+              <span>Azalt</span>
+              <span>Artır</span>
             </div>
           </div>
 
@@ -223,7 +223,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
             <div className="flex items-start gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
               <p className="text-xs text-slate-600 leading-relaxed">
-                The AI uses <span className="font-semibold text-primary">Thin-Plate Spline (TPS)</span> logic to preserve skin texture while warping the geometry. Changes are applied to the 468-point mesh.
+                AI, cilt dokusunu koruyarak geometriyi değiştirmek için <span className="font-semibold text-primary">Thin-Plate Spline (TPS)</span> mantığını kullanır. Değişiklikler 468 noktalı yüz ağı üzerinde uygulanır.
               </p>
             </div>
           </div>
@@ -232,7 +232,7 @@ export function SimulatorEngine({ onSnapshot }: SimulatorProps) {
 
         <div className="p-6 border-t border-slate-100 bg-slate-50/50">
           <Button className="w-full shadow-lg shadow-primary/20" size="lg">
-            Generate Report
+            Rapor Oluştur
           </Button>
         </div>
       </Card>
