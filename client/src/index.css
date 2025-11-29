@@ -4,17 +4,19 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Modern, Ethereal MedTech Palette */
   --color-background: hsl(210 40% 98%);
-  --color-foreground: hsl(222 47% 11%);
+  --color-foreground: hsl(215 25% 27%);
 
   --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(222 47% 11%);
+  --color-card-foreground: hsl(215 25% 27%);
 
   --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(222 47% 11%);
+  --color-popover-foreground: hsl(215 25% 27%);
 
-  --color-primary: hsl(199 89% 48%); /* Clinical Blue/Cyan */
-  --color-primary-foreground: hsl(210 40% 98%);
+  /* Primary is now a sophisticated Teal/Cyan gradient base */
+  --color-primary: hsl(186 65% 42%); 
+  --color-primary-foreground: hsl(0 0% 100%);
 
   --color-secondary: hsl(210 40% 96.1%);
   --color-secondary-foreground: hsl(222 47% 11%);
@@ -22,19 +24,19 @@
   --color-muted: hsl(210 40% 96.1%);
   --color-muted-foreground: hsl(215.4 16.3% 46.9%);
 
-  --color-accent: hsl(199 89% 94%);
-  --color-accent-foreground: hsl(199 89% 48%);
+  --color-accent: hsl(186 65% 96%);
+  --color-accent-foreground: hsl(186 65% 42%);
 
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(210 40% 98%);
 
   --color-border: hsl(214.3 31.8% 91.4%);
   --color-input: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(199 89% 48%);
+  --color-ring: hsl(186 65% 42%);
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
 
   --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
 }
@@ -44,17 +46,33 @@
     @apply border-border;
   }
   body {
-    @apply font-sans antialiased bg-background text-foreground selection:bg-primary/20 selection:text-primary;
+    @apply font-sans antialiased bg-slate-50 text-foreground selection:bg-primary/20 selection:text-primary;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(186, 65%, 96%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 100%, hsla(210, 100%, 96%, 1) 0, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
-/* Custom Utilities for the overlay */
 @layer utilities {
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-2xl shadow-slate-200/50;
   }
   
-  .mesh-overlay {
-    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  .text-gradient {
+    @apply bg-gradient-to-r from-slate-800 to-slate-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-cyan-600 bg-clip-text text-transparent;
+  }
+
+  /* Hide scrollbar for clean UI */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
